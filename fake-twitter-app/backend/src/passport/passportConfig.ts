@@ -1,4 +1,3 @@
-// src/passport/passportConfig.ts
 import { PassportStatic } from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { User, IUser } from '../models/User';
@@ -8,21 +7,38 @@ export const configurePassport = (passport: PassportStatic): void => {
         done(null, user._id);
     });
 
-    passport.deserializeUser((id: string, done) => {
-        User.findById(id, (err: any, user: IUser) => {
-            done(err, user);
-        });
+    passport.deserializeUser(async (id: string, done) => {
+        try {
+            const user = await User.findById(id);
+            return done(null, user);
+        } catch (error) {
+            return done(error);
+        }
     });
 
-    passport.use(new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
-        User.findOne({ email }, (err: Error | null, user: IUser) => {
-            if (err) return done(err);
-            if (!user) return done(null, false, { message: 'Incorrect email.' });
-            user.comparePassword(password, (err, isMatch) => {
-                if (err) return done(err);
-                if (!isMatch) return done(null, false, { message: 'Incorrect password.' });
-                return done(null, user);
-            });
-        });
-    }));
+    passport.use(new LocalStrategy(
+        { usernameField: 'email' },
+        async (email: string, password: string, done) => {
+            try {
+                // A findOne callback helyett async/await-et használunk
+                const user = await User.findOne({ email }); // Így már Promise-alapú
+
+                if (!user) {
+                    return done(null, false, { message: 'Incorrect email.' });
+                }
+
+                // comparePassword maradhat callback-es, ha a modelben úgy definiáltad
+                user.comparePassword(password, (err, isMatch) => {
+                    if (err) return done(err);
+                    if (!isMatch) {
+                        return done(null, false, { message: 'Incorrect password.' });
+                    }
+                    return done(null, user);
+                });
+
+            } catch (error) {
+                return done(error);
+            }
+        }
+    ));
 };

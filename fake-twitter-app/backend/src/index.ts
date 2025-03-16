@@ -36,6 +36,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 configurePassport(passport);
 
+// Alapértelmezett útvonal a gyökér URL-re
+app.get('/', (req, res) => {
+    res.send(`Server is running on port ${port}`);
+});
+
 // API végpontok
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
