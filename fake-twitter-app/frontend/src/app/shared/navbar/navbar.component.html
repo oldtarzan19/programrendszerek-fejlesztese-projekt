@@ -1,1 +1,8 @@
-<p>navbar works!</p>
+<mat-toolbar color="primary">
+  <span>Fake Twitter</span>
+  <span class="spacer"></span>
+  <button mat-button routerLink="/feed">Feed</button>
+  <button mat-button routerLink="/profile">Profile</button>
+  <button mat-button routerLink="/users">Users</button>
+  <button mat-button (click)="logout()">Logout</button>
+</mat-toolbar>
