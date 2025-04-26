@@ -1,1 +1,50 @@
-<p>user-management works!</p>
+<div class="user-management-container">
+  <h2>User Management</h2>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+    <!-- Username column -->
+    <ng-container matColumnDef="username">
+      <th mat-header-cell *matHeaderCellDef>Username</th>
+      <td mat-cell *matCellDef="let u">{{ u.username }}</td>
+    </ng-container>
+
+    <!-- Email column -->
+    <ng-container matColumnDef="email">
+      <th mat-header-cell *matHeaderCellDef>Email</th>
+      <td mat-cell *matCellDef="let u">{{ u.email }}</td>
+    </ng-container>
+
+    <!-- Role column -->
+    <ng-container matColumnDef="role">
+      <th mat-header-cell *matHeaderCellDef>Role</th>
+      <td mat-cell *matCellDef="let u">{{ u.role }}</td>
+    </ng-container>
+
+    <!-- Suspended column -->
+    <ng-container matColumnDef="isSuspended">
+      <th mat-header-cell *matHeaderCellDef>Suspended</th>
+      <td mat-cell *matCellDef="let u">{{ u.isSuspended }}</td>
+    </ng-container>
+
+    <!-- Actions column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let u">
+        <button
+               mat-icon-button
+               (click)="u.isSuspended ? unsuspend(u) : suspend(u)"
+             >
+               <mat-icon>{{ u.isSuspended ? 'autorenew' : 'block' }}</mat-icon>
+             </button>
+        <button mat-icon-button color="warn" (click)="delete(u)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>

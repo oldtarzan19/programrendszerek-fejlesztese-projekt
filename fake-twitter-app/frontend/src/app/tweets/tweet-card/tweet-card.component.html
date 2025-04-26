@@ -1,6 +1,10 @@
 <mat-card class="tweet-card">
   <mat-card-header>
-    <mat-card-title>{{ tweet.user.username }}</mat-card-title>
+    <mat-card-title>
+      <a [routerLink]="['/profile', tweet.user._id]">
+        {{ tweet.user.username }}
+      </a>
+    </mat-card-title>
     <mat-card-subtitle>{{ tweet.createdAt | date:'short' }}</mat-card-subtitle>
   </mat-card-header>
 

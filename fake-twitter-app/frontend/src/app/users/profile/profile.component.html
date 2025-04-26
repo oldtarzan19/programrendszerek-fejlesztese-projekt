@@ -1,1 +1,36 @@
-<p>profile works!</p>
+<div class="profile-container" *ngIf="user">
+  <h2>{{ isOwnProfile ? 'My Profile' : user.username + '\'s Profile' }}</h2>
+
+  <form [formGroup]="form" (ngSubmit)="save()" *ngIf="isOwnProfile">
+    <mat-form-field appearance="fill">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" />
+      <mat-error *ngIf="form.get('email')?.hasError('required')">
+        Email required
+      </mat-error>
+      <mat-error *ngIf="form.get('email')?.hasError('email')">
+        Invalid email
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Username</mat-label>
+      <input matInput formControlName="username" />
+      <mat-error *ngIf="form.get('username')?.hasError('required')">
+        Username required
+      </mat-error>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit">Save</button>
+    <div class="error" *ngIf="error">{{ error }}</div>
+  </form>
+
+  <div *ngIf="!isOwnProfile" class="follow-stats">
+    <button mat-raised-button color="primary" (click)="toggleFollow()">
+      {{ isFollowing ? 'Unfollow' : 'Follow' }}
+    </button>
+  </div>
+
+  <p>Followers: {{ followersCount }}</p>
+  <p>Following: {{ followingCount }}</p>
+</div>

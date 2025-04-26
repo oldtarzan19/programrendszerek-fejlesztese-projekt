@@ -17,20 +17,26 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'feed/:id/comments',
+    loadComponent: () => import('./comments/comment-list/comment-list.component')
+      .then(m => m.CommentListComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'profile',
     loadComponent: () => import('./users/profile/profile.component').then(m => m.ProfileComponent),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'profile/:id',
+    loadComponent: () => import('./users/profile/profile.component')
+      .then(m => m.ProfileComponent),
     canActivate: [authGuard]
   },
   {
     path: 'users',
     loadComponent: () => import('./users/user-management/user-management.component')
       .then(m => m.UserManagementComponent),
-    canActivate: [authGuard]
-  },
-  {
-    path: 'feed/:id/comments',
-    loadComponent: () => import('./comments/comment-list/comment-list.component')
-      .then(m => m.CommentListComponent),
     canActivate: [authGuard]
   },
   { path: '**', redirectTo: 'feed' }

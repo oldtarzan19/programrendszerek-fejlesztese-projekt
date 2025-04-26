@@ -23,6 +23,12 @@ router.post('/login', (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate('local', (err: Error | null, user: IUser | false, info?: IVerifyOptions) => {
         if (err) return next(err);
         if (!user) return res.status(400).json({ message: info?.message || 'Login failed' });
+
+        // Ellenőrizzük a felfüggesztést
+        if (user.isSuspended) {
+            return res.status(403).json({ message: 'Your account is suspended' });
+        }
+
         req.logIn(user, err => {
             if (err) return next(err);
             return res.status(200).json({ message: 'Login successful', user });

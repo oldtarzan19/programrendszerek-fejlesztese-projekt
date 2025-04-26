@@ -46,7 +46,6 @@ export class LoginComponent {
     this.auth.login(this.form.value).subscribe({
       next: () => this.router.navigate(['/feed']),
       error: err => {
-        // backend error.error.message vagy általános fallback
         this.error = err.error?.message || 'Login failed';
       }
     });

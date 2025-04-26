@@ -15,14 +15,10 @@ router.get('/', isAuthenticated, isAdmin, async (req: Request, res: Response): P
     }
 });
 
-// Egy felhasználó lekérése (saját vagy admin)
-router.get('/:id', isAuthenticated, async (req: Request, res: Response):Promise<void> => {
+// Add return type and make sure all paths return void
+router.get('/:id', isAuthenticated, async (req: Request, res: Response): Promise<void> => {
     try {
-        if (req.user && (req.user as any)._id.toString() !== req.params.id && (req.user as any).role !== 'admin') {
-            res.status(403).send('Forbidden');
-            return;
-        }
-        const user = await User.findById(req.params.id);
+        const user = await User.findById(req.params.id).select('-password -__v');
         if (!user) {
             res.status(404).send('User not found');
             return;
@@ -42,6 +38,19 @@ router.patch('/:id/suspend', isAuthenticated, isAdmin, async (req: Request, res:
             return;
         }
         res.status(200).json({ message: 'User suspended', user });
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+router.patch('/:id/unsuspend', isAuthenticated, isAdmin, async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = await User.findByIdAndUpdate(req.params.id, { isSuspended: false }, { new: true  });
+        if (!user){
+            res.status(404).send('User not found');
+            return;
+        }
+        res.status(200).json({ message: 'User unsuspended', user });
     } catch (error) {
         res.status(500).json({ error });
     }

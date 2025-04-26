@@ -23,6 +23,7 @@ export class AuthService {
           // Belépéskor elmentjük a userId-t és a login flag-et
           localStorage.setItem('userId', res.user._id);
           localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userRole', res.user.role);
         })
       );
   }
@@ -38,6 +39,7 @@ export class AuthService {
         tap(() => {
           localStorage.removeItem('userId');
           localStorage.removeItem('isLoggedIn');
+          localStorage.removeItem('userRole');
           this.router.navigate(['/login']);
         })
       );
@@ -50,5 +52,13 @@ export class AuthService {
   /** Az aktuálisan belépett felhasználó ID-ja, vagy null ha nincs bejelentkezve */
   get currentUserId(): string | null {
     return localStorage.getItem('userId');
+  }
+
+  get currentUserRole(): 'admin' | 'user' | null {
+    return (localStorage.getItem('userRole') as 'admin' | 'user') ?? null;
+  }
+
+  get isAdmin(): boolean {
+    return this.currentUserRole === 'admin';
   }
 }
