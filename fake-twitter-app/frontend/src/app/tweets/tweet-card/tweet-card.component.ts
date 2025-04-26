@@ -24,7 +24,7 @@ export class TweetCardComponent {
   @Input() tweet!: Tweet;
   @Input() refreshFeed!: () => void; // opcionális, ha parent újratöltené a feedet
 
-  constructor(private tweetService: TweetService, private auth: AuthService) {}
+  constructor(private tweetService: TweetService, public auth: AuthService) {}
 
   get isLiked(): boolean {
     const me = this.auth.currentUserId;
@@ -54,5 +54,18 @@ export class TweetCardComponent {
       },
       error: () => console.error('Retweet failed')
     });
+  }
+
+  deleteTweet(): void {
+    this.tweetService.delete(this.tweet._id).subscribe({
+      next: () => this.refreshFeed?.(),
+      error: () => console.error('Delete tweet failed')
+    });
+  }
+
+  /** admin vagy a tweet tulajdonosa */
+  canDelete(): boolean {
+    const me = this.auth.currentUserId;
+    return this.auth.isAdmin || (me !== null && me === this.tweet.user._id);
   }
 }

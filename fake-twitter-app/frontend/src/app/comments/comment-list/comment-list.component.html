@@ -12,7 +12,7 @@
 
   <mat-list *ngIf="!loading && comments.length">
     <mat-list-item *ngFor="let c of comments">
-      <mat-card>
+      <mat-card class="comment-card">
         <mat-card-header>
           <mat-card-title>{{ c.user.username }}</mat-card-title>
           <mat-card-subtitle>{{ c.createdAt | date:'short' }}</mat-card-subtitle>
@@ -20,6 +20,13 @@
         <mat-card-content>
           {{ c.content }}
         </mat-card-content>
+
+        <!-- Törlés gomb, ha te vagy a szerző vagy admin -->
+        <mat-card-actions *ngIf="canDelete(c)">
+          <button mat-icon-button color="warn" (click)="deleteComment(c)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-card-actions>
       </mat-card>
     </mat-list-item>
   </mat-list>

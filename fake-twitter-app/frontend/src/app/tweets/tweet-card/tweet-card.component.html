@@ -25,5 +25,15 @@
     <button mat-icon-button routerLink="/feed/{{tweet._id}}/comments">
       <mat-icon>chat_bubble_outline</mat-icon>
     </button>
+
+       <!-- Törlés gomb: csak ha tulaj vagy admin -->
+       <button
+         mat-icon-button
+         *ngIf="canDelete()"
+         color="warn"
+         (click)="deleteTweet()"
+       >
+         <mat-icon>delete</mat-icon>
+       </button>
   </mat-card-actions>
 </mat-card>

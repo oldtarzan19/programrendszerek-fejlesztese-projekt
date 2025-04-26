@@ -21,6 +21,11 @@ export class TweetService {
     return this.http.get<Tweet[]>(this.base);
   }
 
+
+ getByUser(userId: string): Observable<Tweet[]> {
+       return this.http.get<Tweet[]>(`${this.base}?user=${userId}`);
+ }
+
   create(content: string): Observable<Tweet> {
     return this.http.post<Tweet>(this.base, { content });
   }
@@ -36,4 +41,9 @@ export class TweetService {
   retweet(id: string): Observable<Tweet> {
     return this.http.post<Tweet>(`${this.base}/${id}/retweet`, {});
   }
+
+ /** Tweet törlése */
+ delete(id: string): Observable<{ message: string }> {
+       return this.http.delete<{ message: string }>(`${this.base}/${id}`);
+     }
 }

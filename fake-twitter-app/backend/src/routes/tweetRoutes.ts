@@ -8,7 +8,11 @@ const router = Router();
 // Összes tweet lekérése
 router.get('/', async (req: Request, res: Response): Promise<void> => {
     try {
-        const tweets = await Tweet.find({}).populate('user', 'username email');
+        const filter: any = {};
+        if (req.query.user) {
+            filter.user = req.query.user;
+        }
+        const tweets = await Tweet.find(filter).populate('user', 'username email');
         res.status(200).json(tweets);
     } catch (error) {
         res.status(500).json({ error });

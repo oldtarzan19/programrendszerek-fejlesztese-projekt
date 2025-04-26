@@ -1,5 +1,5 @@
 import { Component, OnInit }   from '@angular/core';
-import { CommonModule }        from '@angular/common';
+import {CommonModule, NgFor, NgIf} from '@angular/common';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -14,6 +14,9 @@ import { ActivatedRoute }       from '@angular/router';
 import { User, UserService }   from '../../services/user.service';
 import { AuthService }         from '../../core/auth.service';
 import { FollowService }       from '../../services/follow.service';
+import {MatIconModule} from '@angular/material/icon';
+import {MatCardModule} from '@angular/material/card';
+import {Tweet, TweetService} from '../../services/tweet.service';
 
 @Component({
   selector: 'app-profile',
@@ -23,7 +26,11 @@ import { FollowService }       from '../../services/follow.service';
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
+    MatCardModule,
+    MatIconModule,
+    NgIf,
+    NgFor
   ],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
@@ -38,12 +45,17 @@ export class ProfileComponent implements OnInit {
   followingCount = 0;
   isFollowing = false;
 
+  userTweets: Tweet[] = [];
+  tweetsLoading = false;
+  tweetsError?: string;
+
   constructor(
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private userService: UserService,
     private auth: AuthService,
-    private followService: FollowService
+    private followService: FollowService,
+    private tweetService: TweetService,
   ) {}
 
   ngOnInit(): void {
@@ -51,6 +63,7 @@ export class ProfileComponent implements OnInit {
     this.userId = this.route.snapshot.paramMap.get('id') || this.auth.currentUserId!;
     this.isOwnProfile = this.userId === this.auth.currentUserId;
     this.loadProfile();
+    this.loadUserTweets();
   }
 
   loadProfile(): void {
@@ -112,4 +125,27 @@ export class ProfileComponent implements OnInit {
         .subscribe(() => this.loadFollowStats());
     }
   }
+
+ /** Kilistázzuk a profil tweetjeit */
+ loadUserTweets(): void {
+       this.tweetsLoading = true;
+       this.tweetService.getByUser(this.userId).subscribe({
+           next: tws => {
+             this.userTweets = tws;
+             this.tweetsLoading = false;
+           },
+           error: () => {
+             this.tweetsError = 'Could not load tweets';
+             this.tweetsLoading = false;
+           }
+       });
+ }
+
+ /** Törlés után újratöltjük */
+ deleteTweet(tweet: Tweet): void {
+       this.tweetService.delete(tweet._id).subscribe({
+           next: () => this.loadUserTweets(),
+           error: () => this.tweetsError = 'Delete failed'
+         });
+ }
 }

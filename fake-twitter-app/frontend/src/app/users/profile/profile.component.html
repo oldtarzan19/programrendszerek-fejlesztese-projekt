@@ -5,10 +5,10 @@
     <mat-form-field appearance="fill">
       <mat-label>Email</mat-label>
       <input matInput formControlName="email" />
-      <mat-error *ngIf="form.get('email')?.hasError('required')">
+      <mat-error *ngIf="form.get('email')?.errors?.['required']">
         Email required
       </mat-error>
-      <mat-error *ngIf="form.get('email')?.hasError('email')">
+      <mat-error *ngIf="form.get('email')?.errors?.['email']">
         Invalid email
       </mat-error>
     </mat-form-field>
@@ -16,7 +16,7 @@
     <mat-form-field appearance="fill">
       <mat-label>Username</mat-label>
       <input matInput formControlName="username" />
-      <mat-error *ngIf="form.get('username')?.hasError('required')">
+      <mat-error *ngIf="form.get('username')?.errors?.['required']">
         Username required
       </mat-error>
     </mat-form-field>
@@ -33,4 +33,23 @@
 
   <p>Followers: {{ followersCount }}</p>
   <p>Following: {{ followingCount }}</p>
+
+  <hr />
+
+  <h3>{{ isOwnProfile ? 'My Tweets' : (user.username + '\'s Tweets') }}</h3>
+
+  <div *ngIf="tweetsLoading">Loading tweets…</div>
+  <div *ngIf="tweetsError" class="error">{{ tweetsError }}</div>
+
+  <mat-card *ngFor="let t of userTweets" class="tweet-card">
+    <mat-card-header>
+      <mat-card-title>{{ t.content }}</mat-card-title>
+      <mat-card-subtitle>{{ t.createdAt | date:'short' }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-actions *ngIf="isOwnProfile">
+      <button mat-icon-button color="warn" (click)="deleteTweet(t)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </mat-card-actions>
+  </mat-card>
 </div>
