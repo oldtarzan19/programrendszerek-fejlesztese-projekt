@@ -1,1 +1,25 @@
-<p>tweet-card works!</p>
+<mat-card class="tweet-card">
+  <mat-card-header>
+    <mat-card-title>{{ tweet.user.username }}</mat-card-title>
+    <mat-card-subtitle>{{ tweet.createdAt | date:'short' }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    {{ tweet.content }}
+  </mat-card-content>
+
+  <mat-card-actions>
+    <button mat-icon-button (click)="toggleLike()">
+      <mat-icon>{{ isLiked ? 'favorite' : 'favorite_border' }}</mat-icon>
+      <span>{{ tweet.likes.length }}</span>
+    </button>
+
+    <button mat-icon-button (click)="retweet()">
+      <mat-icon>repeat</mat-icon>
+    </button>
+
+    <button mat-icon-button routerLink="/feed/{{tweet._id}}/comments">
+      <mat-icon>chat_bubble_outline</mat-icon>
+    </button>
+  </mat-card-actions>
+</mat-card>

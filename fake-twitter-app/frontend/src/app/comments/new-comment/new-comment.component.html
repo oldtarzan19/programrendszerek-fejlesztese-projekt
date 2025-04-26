@@ -1,1 +1,13 @@
-<p>new-comment works!</p>
+<form [formGroup]="form" (ngSubmit)="submit()" class="new-comment-form">
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Your comment</mat-label>
+    <textarea matInput formControlName="content" rows="2"></textarea>
+    <mat-error *ngIf="form.get('content')?.errors?.['required']">
+      Comment is required
+    </mat-error>
+  </mat-form-field>
+  <button mat-raised-button color="primary" type="submit">
+    Post Comment
+  </button>
+  <div class="error" *ngIf="error">{{ error }}</div>
+</form>

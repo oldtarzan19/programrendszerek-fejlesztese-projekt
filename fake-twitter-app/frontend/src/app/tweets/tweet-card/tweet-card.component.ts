@@ -1,11 +1,58 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { CommonModule }      from '@angular/common';
+import { MatCardModule }     from '@angular/material/card';
+import { MatIconModule }     from '@angular/material/icon';
+import { MatButtonModule }   from '@angular/material/button';
+import { Tweet, TweetService } from '../../services/tweet.service';
+import {RouterLink} from '@angular/router';
+import {AuthService} from '../../core/auth.service';
 
 @Component({
   selector: 'app-tweet-card',
-  imports: [],
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatIconModule,
+    MatButtonModule,
+    RouterLink
+  ],
   templateUrl: './tweet-card.component.html',
-  styleUrl: './tweet-card.component.scss'
+  styleUrls: ['./tweet-card.component.scss']
 })
 export class TweetCardComponent {
+  @Input() tweet!: Tweet;
+  @Input() refreshFeed!: () => void; // opcionális, ha parent újratöltené a feedet
 
+  constructor(private tweetService: TweetService, private auth: AuthService) {}
+
+  get isLiked(): boolean {
+    const me = this.auth.currentUserId;
+    return !!me && this.tweet.likes.includes(me);
+  }
+
+  toggleLike(): void {
+    const call = this.isLiked
+      ? this.tweetService.unlike(this.tweet._id)
+      : this.tweetService.like(this.tweet._id);
+
+    call.subscribe({
+      next: updated => {
+        this.tweet.likes = updated.likes;
+      },
+      error: () => console.error('Like/Unlike failed')
+    });
+  }
+
+  retweet(): void {
+    this.tweetService.retweet(this.tweet._id).subscribe({
+      next: _ => {
+        // ha a parent feed újratöltést szeretne, hívja a passed-in callbacket
+        if (this.refreshFeed) {
+          this.refreshFeed();
+        }
+      },
+      error: () => console.error('Retweet failed')
+    });
+  }
 }

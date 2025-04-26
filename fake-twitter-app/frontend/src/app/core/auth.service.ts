@@ -1,7 +1,13 @@
+// src/app/core/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
+
+interface LoginResponse {
+  message: string;
+  user: { _id: string; username: string; email: string; role: string };
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -11,9 +17,11 @@ export class AuthService {
 
   login(credentials: { email: string; password: string }) {
     return this.http
-      .post<{ message: string }>(`${this.base}/login`, credentials, { withCredentials: true })
+      .post<LoginResponse>(`${this.base}/login`, credentials, { withCredentials: true })
       .pipe(
-        tap(() => {
+        tap(res => {
+          // Belépéskor elmentjük a userId-t és a login flag-et
+          localStorage.setItem('userId', res.user._id);
           localStorage.setItem('isLoggedIn', 'true');
         })
       );
@@ -28,6 +36,7 @@ export class AuthService {
       .post<{ message: string }>(`${this.base}/logout`, {}, { withCredentials: true })
       .pipe(
         tap(() => {
+          localStorage.removeItem('userId');
           localStorage.removeItem('isLoggedIn');
           this.router.navigate(['/login']);
         })
@@ -36,5 +45,10 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     return localStorage.getItem('isLoggedIn') === 'true';
+  }
+
+  /** Az aktuálisan belépett felhasználó ID-ja, vagy null ha nincs bejelentkezve */
+  get currentUserId(): string | null {
+    return localStorage.getItem('userId');
   }
 }

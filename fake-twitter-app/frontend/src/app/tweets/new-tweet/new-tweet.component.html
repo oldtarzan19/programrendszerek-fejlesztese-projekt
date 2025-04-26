@@ -1,1 +1,11 @@
-<p>new-tweet works!</p>
+<form [formGroup]="form" (ngSubmit)="submit()" class="new-tweet-form">
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>What’s happening?</mat-label>
+    <textarea matInput formControlName="content" rows="3"></textarea>
+    <mat-error *ngIf="form.get('content')?.hasError('required')">
+      Content cannot be empty
+    </mat-error>
+  </mat-form-field>
+  <button mat-raised-button color="primary" type="submit">Tweet</button>
+  <div class="error" *ngIf="error">{{ error }}</div>
+</form>

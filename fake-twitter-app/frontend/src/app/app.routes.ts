@@ -27,5 +27,11 @@ export const routes: Routes = [
       .then(m => m.UserManagementComponent),
     canActivate: [authGuard]
   },
+  {
+    path: 'feed/:id/comments',
+    loadComponent: () => import('./comments/comment-list/comment-list.component')
+      .then(m => m.CommentListComponent),
+    canActivate: [authGuard]
+  },
   { path: '**', redirectTo: 'feed' }
 ];
