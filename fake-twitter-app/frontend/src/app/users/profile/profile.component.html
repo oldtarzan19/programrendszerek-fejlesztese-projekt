@@ -47,8 +47,9 @@
   </form>
 
   <!-- Follow gomb ha más profil -->
-  <div *ngIf="!isOwnProfile" class="flex items-center space-x-4">
+  <div class="flex items-center space-x-4">
     <button
+      *ngIf="!isOwnProfile"
       mat-raised-button
       color="primary"
       (click)="toggleFollow()"
@@ -60,11 +61,11 @@
     >
       {{ isFollowing ? 'Unfollow' : 'Follow' }}
     </button>
-    <div>
+    <div class="flex items-center space-x-2">
       <span class="font-semibold">{{ followersCount }}</span>
       <span class="text-gray-600">Followers</span>
     </div>
-    <div>
+    <div class="flex items-center space-x-2">
       <span class="font-semibold">{{ followingCount }}</span>
       <span class="text-gray-600">Following</span>
     </div>

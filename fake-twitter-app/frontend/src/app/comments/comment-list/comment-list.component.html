@@ -1,76 +1,76 @@
-<!-- src/app/comments/comment-list/comment-list.component.html -->
-<div class="comment-list-container">
-  <h3>Comments</h3>
+<div class="comment-list-container max-w-xl mx-auto p-4 space-y-6 bg-white rounded-lg shadow">
+  <h3 class="text-xl font-semibold text-gray-800">Comments</h3>
 
   <!-- Új komment űrlap -->
   <app-new-comment
     [tweetId]="tweetId"
     (commented)="loadComments()"
+    class="block"
   ></app-new-comment>
 
-  <div *ngIf="loading">Loading comments…</div>
-  <div *ngIf="error" class="error">{{ error }}</div>
+  <div *ngIf="loading" class="text-center text-gray-500">Loading comments…</div>
+  <div *ngIf="error" class="text-center text-red-500">{{ error }}</div>
 
-  <mat-list *ngIf="!loading && comments.length">
-    <mat-list-item *ngFor="let c of comments">
-      <mat-card class="comment-card">
-        <mat-card-header>
-          <mat-card-title>{{ c.user.username }}</mat-card-title>
-          <mat-card-subtitle>{{ c.createdAt | date:'short' }}</mat-card-subtitle>
-        </mat-card-header>
+  <div *ngIf="!loading && comments.length" class="space-y-4">
+    <div *ngFor="let c of comments" class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+      <div class="flex justify-between items-center mb-2">
+        <div class="font-medium text-gray-700">{{ c.user.username }}</div>
+        <div class="text-xs text-gray-400">{{ c.createdAt | date:'short' }}</div>
+      </div>
 
-        <mat-card-content>
-          <!-- Ha nincs szerkesztés -->
-          <ng-container *ngIf="editingCommentId !== c._id; else editTpl">
-            {{ c.content }}
-          </ng-container>
-          <!-- Szerkesztő űrlap -->
-          <ng-template #editTpl>
-            <form [formGroup]="editForm" class="edit-comment-form">
-              <mat-form-field appearance="fill" class="full-width">
-                <mat-label>Edit comment</mat-label>
-                <textarea matInput formControlName="content" rows="2"></textarea>
-              </mat-form-field>
-            </form>
-          </ng-template>
-        </mat-card-content>
+      <!-- Tartalom vagy szerkesztő űrlap -->
+      <div class="mb-2">
+        <ng-container *ngIf="editingCommentId !== c._id; else editTpl">
+          <p class="text-gray-800">{{ c.content }}</p>
+        </ng-container>
+        <ng-template #editTpl>
+          <form [formGroup]="editForm" class="space-y-2">
+            <textarea
+              formControlName="content"
+              rows="2"
+              class="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            ></textarea>
+            <div class="flex space-x-2">
+              <button
+                type="button"
+                (click)="saveEdit(c)"
+                [disabled]="!editForm.valid"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded disabled:opacity-50"
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                (click)="cancelEdit()"
+                class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </ng-template>
+      </div>
 
-        <mat-card-actions>
-          <!-- Edit gomb -->
-          <button
-            mat-icon-button
-            *ngIf="canModify(c) && editingCommentId !== c._id"
-            (click)="startEdit(c)"
-          >
-            <mat-icon>edit</mat-icon>
-          </button>
+      <!-- Gombok -->
+      <div class="flex space-x-2">
+        <button
+          *ngIf="canModify(c) && editingCommentId !== c._id"
+          (click)="startEdit(c)"
+          class="text-gray-600 hover:text-blue-600"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
 
-          <!-- Save / Cancel gomb szerkesztés közben -->
-          <ng-container *ngIf="editingCommentId === c._id">
-            <button
-              mat-button
-              color="primary"
-              (click)="saveEdit(c)"
-              [disabled]="!editForm.valid"
-            >
-              Save
-            </button>
-            <button mat-button (click)="cancelEdit()">Cancel</button>
-          </ng-container>
+        <button
+          *ngIf="canModify(c)"
+          (click)="deleteComment(c)"
+          class="ml-auto text-red-600 hover:text-red-800"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
 
-          <!-- Törlés gomb szerzőnek vagy adminnak -->
-          <button
-            mat-icon-button
-            color="warn"
-            *ngIf="canModify(c)"
-            (click)="deleteComment(c)"
-          >
-            <mat-icon>delete</mat-icon>
-          </button>
-        </mat-card-actions>
-      </mat-card>
-    </mat-list-item>
-  </mat-list>
-
-  <p *ngIf="!loading && !comments.length">No comments yet.</p>
+  <p *ngIf="!loading && !comments.length" class="text-center text-gray-500">No comments yet.</p>
 </div>
