@@ -1,39 +1,55 @@
-<mat-card class="tweet-card">
-  <mat-card-header>
-    <mat-card-title>
-      <a [routerLink]="['/profile', tweet.user._id]">
+<mat-card class="tweet-card bg-white shadow rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
+  <mat-card-header class="flex items-center justify-between pb-2 border-b border-gray-100">
+    <div class="flex items-center space-x-2">
+      <a
+        [routerLink]="['/profile', tweet.user._id]"
+        class="font-semibold text-blue-600 hover:underline"
+      >
         {{ tweet.user.username }}
       </a>
-    </mat-card-title>
-    <mat-card-subtitle>{{ tweet.createdAt | date:'short' }}</mat-card-subtitle>
+      <span class="text-gray-400 text-sm">{{ tweet.createdAt | date:'short' }}</span>
+    </div>
   </mat-card-header>
 
-  <mat-card-content>
+  <mat-card-content class="py-4 text-gray-800">
     {{ tweet.content }}
   </mat-card-content>
 
-  <mat-card-actions>
-    <button mat-icon-button (click)="toggleLike()">
+  <mat-card-actions class="flex items-center space-x-4 border-t border-gray-100 pt-2">
+    <button
+      mat-icon-button
+      (click)="toggleLike()"
+      class="flex items-center space-x-1 text-gray-600 hover:text-red-500"
+    >
       <mat-icon>{{ isLiked ? 'favorite' : 'favorite_border' }}</mat-icon>
-      <span>{{ tweet.likes.length }}</span>
+      <span class="text-sm">{{ tweet.likes.length }}</span>
     </button>
 
-    <button mat-icon-button (click)="retweet()">
+    <button
+      mat-icon-button
+      (click)="retweet()"
+      class="text-gray-600 hover:text-green-500"
+    >
       <mat-icon>repeat</mat-icon>
     </button>
 
-    <button mat-icon-button routerLink="/feed/{{tweet._id}}/comments">
+    <button
+      mat-icon-button
+      [routerLink]="['/feed', tweet._id, 'comments']"
+      class="text-gray-600 hover:text-blue-500"
+    >
       <mat-icon>chat_bubble_outline</mat-icon>
     </button>
 
-       <!-- Törlés gomb: csak ha tulaj vagy admin -->
-       <button
-         mat-icon-button
-         *ngIf="canDelete()"
-         color="warn"
-         (click)="deleteTweet()"
-       >
-         <mat-icon>delete</mat-icon>
-       </button>
+    <!-- Törlés gomb: csak ha tulaj vagy admin -->
+    <button
+      mat-icon-button
+      *ngIf="canDelete()"
+      color="warn"
+      (click)="deleteTweet()"
+      class="ml-auto text-gray-600 hover:text-red-600"
+    >
+      <mat-icon>delete</mat-icon>
+    </button>
   </mat-card-actions>
 </mat-card>
