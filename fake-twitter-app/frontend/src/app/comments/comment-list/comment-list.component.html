@@ -1,3 +1,4 @@
+<!-- src/app/comments/comment-list/comment-list.component.html -->
 <div class="comment-list-container">
   <h3>Comments</h3>
 
@@ -17,13 +18,53 @@
           <mat-card-title>{{ c.user.username }}</mat-card-title>
           <mat-card-subtitle>{{ c.createdAt | date:'short' }}</mat-card-subtitle>
         </mat-card-header>
+
         <mat-card-content>
-          {{ c.content }}
+          <!-- Ha nincs szerkesztés -->
+          <ng-container *ngIf="editingCommentId !== c._id; else editTpl">
+            {{ c.content }}
+          </ng-container>
+          <!-- Szerkesztő űrlap -->
+          <ng-template #editTpl>
+            <form [formGroup]="editForm" class="edit-comment-form">
+              <mat-form-field appearance="fill" class="full-width">
+                <mat-label>Edit comment</mat-label>
+                <textarea matInput formControlName="content" rows="2"></textarea>
+              </mat-form-field>
+            </form>
+          </ng-template>
         </mat-card-content>
 
-        <!-- Törlés gomb, ha te vagy a szerző vagy admin -->
-        <mat-card-actions *ngIf="canDelete(c)">
-          <button mat-icon-button color="warn" (click)="deleteComment(c)">
+        <mat-card-actions>
+          <!-- Edit gomb -->
+          <button
+            mat-icon-button
+            *ngIf="canModify(c) && editingCommentId !== c._id"
+            (click)="startEdit(c)"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+
+          <!-- Save / Cancel gomb szerkesztés közben -->
+          <ng-container *ngIf="editingCommentId === c._id">
+            <button
+              mat-button
+              color="primary"
+              (click)="saveEdit(c)"
+              [disabled]="!editForm.valid"
+            >
+              Save
+            </button>
+            <button mat-button (click)="cancelEdit()">Cancel</button>
+          </ng-container>
+
+          <!-- Törlés gomb szerzőnek vagy adminnak -->
+          <button
+            mat-icon-button
+            color="warn"
+            *ngIf="canModify(c)"
+            (click)="deleteComment(c)"
+          >
             <mat-icon>delete</mat-icon>
           </button>
         </mat-card-actions>

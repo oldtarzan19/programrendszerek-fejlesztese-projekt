@@ -1,19 +1,34 @@
-// src/app/comments/comment-list/comment-list.component.ts
-import { Component, OnInit }           from '@angular/core';
-import { CommonModule }                from '@angular/common';
-import { ActivatedRoute }              from '@angular/router';
-import { CommentService, Comment }     from '../../services/comment.service';
-import { MatListModule }               from '@angular/material/list';
-import { MatCardModule }               from '@angular/material/card';
-import { NewCommentComponent }  from '../new-comment/new-comment.component';
-import {AuthService} from '../../core/auth.service';
-import { MatIcon }                     from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
+import { Component, OnInit }        from '@angular/core';
+import { CommonModule }             from '@angular/common';
+import { ActivatedRoute }           from '@angular/router';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NgIf, NgFor }              from '@angular/common';
+import { MatListModule }            from '@angular/material/list';
+import { MatCardModule }            from '@angular/material/card';
+import { MatButtonModule }          from '@angular/material/button';
+import { MatIconModule }            from '@angular/material/icon';
+import { MatFormFieldModule }       from '@angular/material/form-field';
+import { MatInputModule }           from '@angular/material/input';
+import { CommentService, Comment }  from '../../services/comment.service';
+import { AuthService }              from '../../core/auth.service';
+import {NewCommentComponent} from '../new-comment/new-comment.component';
 
 @Component({
   selector: 'app-comment-list',
   standalone: true,
-  imports: [CommonModule, MatListModule, MatCardModule, NewCommentComponent, MatIcon, MatButtonModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatListModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    NgIf,
+    NgFor,
+    MatFormFieldModule,
+    MatInputModule,
+    NewCommentComponent,
+  ],
   templateUrl: './comment-list.component.html',
   styleUrls: ['./comment-list.component.scss']
 })
@@ -23,10 +38,15 @@ export class CommentListComponent implements OnInit {
   loading = true;
   error?: string;
 
+  // szerkesztéshez
+  editingCommentId: string | null = null;
+  editForm!: FormGroup;
+
   constructor(
     private route: ActivatedRoute,
     private commentService: CommentService,
-    public auth: AuthService
+    public auth: AuthService,
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
@@ -61,5 +81,38 @@ export class CommentListComponent implements OnInit {
       next: () => this.loadComments(),
       error: () => this.error = 'Could not delete comment'
     });
+  }
+
+  /** Csak szerző vagy admin */
+  canModify(comment: Comment): boolean {
+    const me = this.auth.currentUserId;
+    return this.auth.isAdmin || (me !== null && me === comment.user._id);
+  }
+
+  /** Szerkesztés indítása */
+  startEdit(comment: Comment): void {
+    this.editingCommentId = comment._id;
+    this.editForm = this.fb.group({
+      content: [ comment.content, Validators.required ]
+    });
+  }
+
+  /** Mentés */
+  saveEdit(comment: Comment): void {
+    if (!this.editForm.valid) { return; }
+    const newContent = this.editForm.value.content;
+    this.commentService.update(comment._id, newContent)
+      .subscribe({
+        next: () => {
+          this.editingCommentId = null;
+          this.loadComments();
+        },
+        error: () => this.error = 'Could not update comment'
+      });
+  }
+
+  /** Mégse */
+  cancelEdit(): void {
+    this.editingCommentId = null;
   }
 }
