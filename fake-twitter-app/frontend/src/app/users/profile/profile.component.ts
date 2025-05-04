@@ -49,6 +49,10 @@ export class ProfileComponent implements OnInit {
   tweetsLoading = false;
   tweetsError?: string;
 
+  // Szerkesztéshez
+  editingTweetId: string | null = null;
+  editForm!: FormGroup;
+
   constructor(
     private route: ActivatedRoute,
     private fb: FormBuilder,
@@ -148,4 +152,37 @@ export class ProfileComponent implements OnInit {
            error: () => this.tweetsError = 'Delete failed'
          });
  }
+
+  /** Szerkesztés indítása */
+  startEdit(tweet: Tweet): void {
+    this.editingTweetId = tweet._id;
+    this.editForm = this.fb.group({
+      content: [ tweet.content, Validators.required ]
+    });
+  }
+
+  /** Szerkesztés elvetése */
+  cancelEdit(): void {
+    this.editingTweetId = null;
+  }
+
+  /** Szerkesztés mentése */
+  saveEdit(tweet: Tweet): void {
+    if (!this.editForm.valid) return;
+    const newContent = this.editForm.value.content;
+    this.tweetService.update(tweet._id, newContent)
+      .subscribe({
+        next: updated => {
+          // frissítjük a listát
+          this.editingTweetId = null;
+          this.loadUserTweets();
+        },
+        error: () => this.tweetsError = 'Could not update tweet'
+      });
+  }
+
+  /** Ki tud szerkeszteni? */
+  canEdit(tweet: Tweet): boolean {
+    return this.auth.currentUserId === tweet.user._id;
+  }
 }

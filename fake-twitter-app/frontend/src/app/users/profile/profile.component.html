@@ -43,11 +43,47 @@
 
   <mat-card *ngFor="let t of userTweets" class="tweet-card">
     <mat-card-header>
-      <mat-card-title>{{ t.content }}</mat-card-title>
+      <mat-card-title>
+        <!-- ha szerkesztés alatt van, ne ezt, hanem a formot mutatjuk -->
+        <ng-container *ngIf="editingTweetId !== t._id; else editTitle">
+          {{ t.content }}
+        </ng-container>
+        <ng-template #editTitle>
+          <form [formGroup]="editForm" (ngSubmit)="saveEdit(t)" class="edit-form">
+            <mat-form-field appearance="fill" class="full-width">
+              <textarea matInput formControlName="content" rows="2"></textarea>
+            </mat-form-field>
+          </form>
+        </ng-template>
+      </mat-card-title>
       <mat-card-subtitle>{{ t.createdAt | date:'short' }}</mat-card-subtitle>
     </mat-card-header>
-    <mat-card-actions *ngIf="isOwnProfile">
-      <button mat-icon-button color="warn" (click)="deleteTweet(t)">
+
+    <mat-card-actions>
+      <!-- Edit gomb -->
+      <button
+        mat-icon-button
+        *ngIf="canEdit(t) && editingTweetId !== t._id"
+        (click)="startEdit(t)"
+      >
+        <mat-icon>edit</mat-icon>
+      </button>
+
+      <!-- Save / Cancel gombok szerkesztés közben -->
+      <ng-container *ngIf="editingTweetId === t._id">
+        <button mat-button color="primary" (click)="saveEdit(t)" [disabled]="!editForm.valid">
+          Save
+        </button>
+        <button mat-button (click)="cancelEdit()">Cancel</button>
+      </ng-container>
+
+      <!-- Delete gomb -->
+      <button
+        mat-icon-button
+        color="warn"
+        *ngIf="isOwnProfile"
+        (click)="deleteTweet(t)"
+      >
         <mat-icon>delete</mat-icon>
       </button>
     </mat-card-actions>

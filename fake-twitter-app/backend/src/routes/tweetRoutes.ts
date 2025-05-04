@@ -2,6 +2,7 @@
 import { Router, Request, Response } from 'express';
 import { Tweet } from '../models/Tweet';
 import { isAuthenticated, isAdmin } from '../utils/authMiddleware';
+import { Comment } from '../models/Comment';
 
 const router = Router();
 
@@ -81,6 +82,10 @@ router.delete('/:id', isAuthenticated, async (req: Request, res: Response): Prom
             return;
         }
         await Tweet.findByIdAndDelete(req.params.id);
+
+        // Töröljük a tweethez tartozó kommenteket is
+        await Comment.deleteMany({ tweet: req.params.id });
+
         res.status(200).json({ message: 'Tweet deleted' });
     } catch (error) {
         res.status(500).json({ error });

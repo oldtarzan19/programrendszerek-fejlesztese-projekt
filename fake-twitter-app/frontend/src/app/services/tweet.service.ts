@@ -46,4 +46,9 @@ export class TweetService {
  delete(id: string): Observable<{ message: string }> {
        return this.http.delete<{ message: string }>(`${this.base}/${id}`);
      }
+
+  /** Tweet módosítása */
+  update(id: string, content: string): Observable<Tweet> {
+    return this.http.patch<Tweet>(`${this.base}/${id}`, { content });
+  }
 }
