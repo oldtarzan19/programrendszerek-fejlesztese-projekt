@@ -1,4 +1,3 @@
-// src/app/core/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
@@ -20,7 +19,6 @@ export class AuthService {
       .post<LoginResponse>(`${this.base}/login`, credentials, { withCredentials: true })
       .pipe(
         tap(res => {
-          // Belépéskor elmentjük a userId-t és a login flag-et
           localStorage.setItem('userId', res.user._id);
           localStorage.setItem('isLoggedIn', 'true');
           localStorage.setItem('userRole', res.user.role);

@@ -50,7 +50,6 @@ export class CommentListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // A route-ot állítottad be: /feed/:id/comments, tehát itt 'id'-t kapsz
     this.tweetId = this.route.snapshot.paramMap.get('id')!;
     this.loadComments();
   }

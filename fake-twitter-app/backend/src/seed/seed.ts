@@ -1,4 +1,3 @@
-// src/seed/seed.ts
 import mongoose from 'mongoose';
 import { User } from '../models/User';
 import { Tweet } from '../models/Tweet';

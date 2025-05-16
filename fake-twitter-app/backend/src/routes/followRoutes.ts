@@ -1,4 +1,3 @@
-// src/routes/followRoutes.ts
 import { Router, Request, Response } from 'express';
 import { Follow } from '../models/Follow';
 import { isAuthenticated } from '../utils/authMiddleware';

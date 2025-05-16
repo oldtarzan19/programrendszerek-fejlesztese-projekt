@@ -1,4 +1,3 @@
-// src/models/Tweet.ts
 import mongoose, { Document, Model, Schema } from 'mongoose';
 
 export interface ITweet extends Document {

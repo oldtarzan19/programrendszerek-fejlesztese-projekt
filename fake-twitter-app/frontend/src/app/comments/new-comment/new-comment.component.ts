@@ -1,4 +1,3 @@
-// src/app/comments/new-comment/new-comment.component.ts
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule }      from '@angular/common';
 import {

@@ -63,7 +63,6 @@ export class ProfileComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // ha nincs :id param, akkor saját profil
     this.userId = this.route.snapshot.paramMap.get('id') || this.auth.currentUserId!;
     this.isOwnProfile = this.userId === this.auth.currentUserId;
     this.loadProfile();
@@ -114,7 +113,6 @@ export class ProfileComponent implements OnInit {
 
   toggleFollow(): void {
     if (this.isFollowing) {
-      // keresd meg a follow ID-t és töröld
       this.followService
         .getFollowers(this.userId)
         .subscribe(list => {
@@ -173,7 +171,6 @@ export class ProfileComponent implements OnInit {
     this.tweetService.update(tweet._id, newContent)
       .subscribe({
         next: updated => {
-          // frissítjük a listát
           this.editingTweetId = null;
           this.loadUserTweets();
         },

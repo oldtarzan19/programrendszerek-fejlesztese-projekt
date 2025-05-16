@@ -22,7 +22,7 @@ import {AuthService} from '../../core/auth.service';
 })
 export class TweetCardComponent {
   @Input() tweet!: Tweet;
-  @Input() refreshFeed!: () => void; // opcionális, ha parent újratöltené a feedet
+  @Input() refreshFeed!: () => void;
 
   constructor(private tweetService: TweetService, public auth: AuthService) {}
 
@@ -47,7 +47,6 @@ export class TweetCardComponent {
   retweet(): void {
     this.tweetService.retweet(this.tweet._id).subscribe({
       next: _ => {
-        // ha a parent feed újratöltést szeretne, hívja a passed-in callbacket
         if (this.refreshFeed) {
           this.refreshFeed();
         }

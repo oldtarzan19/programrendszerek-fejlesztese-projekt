@@ -1,4 +1,3 @@
-// src/routes/userRoutes.ts
 import { Router, Request, Response } from 'express';
 import { User } from '../models/User';
 import { isAuthenticated, isAdmin } from '../utils/authMiddleware';
@@ -18,7 +17,6 @@ router.get('/', isAuthenticated, isAdmin, async (req: Request, res: Response): P
     }
 });
 
-// Add return type and make sure all paths return void
 router.get('/:id', isAuthenticated, async (req: Request, res: Response): Promise<void> => {
     try {
         const user = await User.findById(req.params.id).select('-password -__v');
@@ -83,20 +81,16 @@ router.delete('/:id', isAuthenticated, async (req: Request, res: Response): Prom
     try {
         const userId = req.params.id;
 
-        // 1) Töröljük a usert
         const user = await User.findByIdAndDelete(userId);
         if (!user) {
             res.status(404).json({ message: 'User not found' });
             return;
         }
 
-        // 2) Töröljük a user által posztolt tweet-eket
         const tweets = await Tweet.find({ user: userId }, '_id');
         const tweetIds = tweets.map(t => t._id);
         await Tweet.deleteMany({ user: userId });
 
-        // 3) Töröljük az összes kommentet, amit a user írt,
-        //    illetve azokat, amelyek a user tweetjeihez tartoztak
         await Comment.deleteMany({
             $or: [
                 { user: userId },
@@ -104,7 +98,6 @@ router.delete('/:id', isAuthenticated, async (req: Request, res: Response): Prom
             ]
         });
 
-        // 4) Töröljük a follow-relációkat is
         await Follow.deleteMany({
             $or: [
                 { follower: userId },

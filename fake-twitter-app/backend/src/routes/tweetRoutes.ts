@@ -1,4 +1,3 @@
-// src/routes/tweetRoutes.ts
 import { Router, Request, Response } from 'express';
 import { Tweet } from '../models/Tweet';
 import { isAuthenticated, isAdmin } from '../utils/authMiddleware';

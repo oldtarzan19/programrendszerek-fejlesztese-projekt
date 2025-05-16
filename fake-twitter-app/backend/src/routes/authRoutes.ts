@@ -1,4 +1,3 @@
-// src/routes/authRoutes.ts
 import { Router, Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import {IUser, User} from '../models/User';

@@ -36,7 +36,6 @@ export class SignupComponent {
     private auth: AuthService,
     private router: Router
   ) {
-    // A FormBuilder-met csak a konstruktorban használjuk, hogy már legyen this.fb
     this.form = this.fb.group({
       email:    ['', [Validators.required, Validators.email]],
       username: ['', Validators.required],

@@ -1,4 +1,3 @@
-// src/models/Follow.ts
 import mongoose, { Document, Model, Schema } from 'mongoose';
 
 export interface IFollow extends Document {

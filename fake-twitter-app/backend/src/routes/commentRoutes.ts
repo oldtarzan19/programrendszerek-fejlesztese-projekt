@@ -1,4 +1,3 @@
-// src/routes/commentRoutes.ts
 import { Router, Request, Response } from 'express';
 import { Comment } from '../models/Comment';
 import { isAuthenticated, isAdmin } from '../utils/authMiddleware';

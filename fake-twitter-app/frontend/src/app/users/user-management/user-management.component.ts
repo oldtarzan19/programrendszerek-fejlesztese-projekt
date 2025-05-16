@@ -1,4 +1,3 @@
-// src/app/users/user-management/user-management.component.ts
 import { Component, OnInit }     from '@angular/core';
 import { CommonModule }          from '@angular/common';
 import { MatTableModule }        from '@angular/material/table';
@@ -34,7 +33,6 @@ export class UserManagementComponent implements OnInit {
   loadUsers(): void {
     this.userService.getAll().subscribe({
       next: users => {
-        // FRISSÍTÉS A dataSource-on
         this.dataSource.data = users;
       },
       error: () => this.error = 'Could not load users'
@@ -44,7 +42,6 @@ export class UserManagementComponent implements OnInit {
   suspend(user: User): void {
     this.userService.suspend(user._id).subscribe({
       next: updated => {
-        // egyéni frissítés helyett újra lekérjük a full listát
         this.loadUsers();
       },
       error: () => this.error = 'Suspend failed'

@@ -30,7 +30,6 @@ export class LoginComponent {
     private auth: AuthService,
     private router: Router
   ) {
-    // itt inicializáljuk, mert itt már van this.fb
     this.form = this.fb.group({
       email:    ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]

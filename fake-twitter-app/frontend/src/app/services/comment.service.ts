@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-// Exportáljunk egy Comment interfészt
 export interface Comment {
   _id: string;
   user: { _id: string; username: string; email: string };
