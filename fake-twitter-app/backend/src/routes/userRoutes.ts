@@ -1,7 +1,9 @@
-// src/routes/userRoutes.ts
 import { Router, Request, Response } from 'express';
 import { User } from '../models/User';
 import { isAuthenticated, isAdmin } from '../utils/authMiddleware';
+import {Tweet} from "../models/Tweet";
+import {Follow} from "../models/Follow";
+import {Comment} from "../models/Comment";
 
 const router = Router();
 
@@ -15,14 +17,9 @@ router.get('/', isAuthenticated, isAdmin, async (req: Request, res: Response): P
     }
 });
 
-// Egy felhasználó lekérése (saját vagy admin)
-router.get('/:id', isAuthenticated, async (req: Request, res: Response):Promise<void> => {
+router.get('/:id', isAuthenticated, async (req: Request, res: Response): Promise<void> => {
     try {
-        if (req.user && (req.user as any)._id.toString() !== req.params.id && (req.user as any).role !== 'admin') {
-            res.status(403).send('Forbidden');
-            return;
-        }
-        const user = await User.findById(req.params.id);
+        const user = await User.findById(req.params.id).select('-password -__v');
         if (!user) {
             res.status(404).send('User not found');
             return;
@@ -42,6 +39,19 @@ router.patch('/:id/suspend', isAuthenticated, isAdmin, async (req: Request, res:
             return;
         }
         res.status(200).json({ message: 'User suspended', user });
+    } catch (error) {
+        res.status(500).json({ error });
+    }
+});
+
+router.patch('/:id/unsuspend', isAuthenticated, isAdmin, async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = await User.findByIdAndUpdate(req.params.id, { isSuspended: false }, { new: true  });
+        if (!user){
+            res.status(404).send('User not found');
+            return;
+        }
+        res.status(200).json({ message: 'User unsuspended', user });
     } catch (error) {
         res.status(500).json({ error });
     }
@@ -69,18 +79,37 @@ router.patch('/:id', isAuthenticated, async (req: Request, res: Response): Promi
 // Felhasználó törlése (saját vagy admin)
 router.delete('/:id', isAuthenticated, async (req: Request, res: Response): Promise<void> => {
     try {
-        if (req.user && (req.user as any)._id.toString() !== req.params.id && (req.user as any).role !== 'admin') {
-            res.status(403).send('Forbidden');
+        const userId = req.params.id;
+
+        const user = await User.findByIdAndDelete(userId);
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
             return;
         }
-        const user = await User.findByIdAndDelete(req.params.id);
-        if (!user){
-            res.status(404).send('User not found');
-            return;
-        }
-        res.status(200).json({ message: 'User deleted' });
+
+        const tweets = await Tweet.find({ user: userId }, '_id');
+        const tweetIds = tweets.map(t => t._id);
+        await Tweet.deleteMany({ user: userId });
+
+        await Comment.deleteMany({
+            $or: [
+                { user: userId },
+                { tweet: { $in: tweetIds } }
+            ]
+        });
+
+        await Follow.deleteMany({
+            $or: [
+                { follower: userId },
+                { following: userId }
+            ]
+        });
+        res.status(200).json({ message: 'User and all related data deleted' });
+        return;
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error });
+        return;
     }
 });
 

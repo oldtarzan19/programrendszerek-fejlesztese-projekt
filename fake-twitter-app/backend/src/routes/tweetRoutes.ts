@@ -1,14 +1,18 @@
-// src/routes/tweetRoutes.ts
 import { Router, Request, Response } from 'express';
 import { Tweet } from '../models/Tweet';
 import { isAuthenticated, isAdmin } from '../utils/authMiddleware';
+import { Comment } from '../models/Comment';
 
 const router = Router();
 
 // Összes tweet lekérése
 router.get('/', async (req: Request, res: Response): Promise<void> => {
     try {
-        const tweets = await Tweet.find({}).populate('user', 'username email');
+        const filter: any = {};
+        if (req.query.user) {
+            filter.user = req.query.user;
+        }
+        const tweets = await Tweet.find(filter).populate('user', 'username email');
         res.status(200).json(tweets);
     } catch (error) {
         res.status(500).json({ error });
@@ -77,6 +81,10 @@ router.delete('/:id', isAuthenticated, async (req: Request, res: Response): Prom
             return;
         }
         await Tweet.findByIdAndDelete(req.params.id);
+
+        // Töröljük a tweethez tartozó kommenteket is
+        await Comment.deleteMany({ tweet: req.params.id });
+
         res.status(200).json({ message: 'Tweet deleted' });
     } catch (error) {
         res.status(500).json({ error });

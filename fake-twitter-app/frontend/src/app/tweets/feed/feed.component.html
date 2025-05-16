@@ -1,0 +1,17 @@
+<div class="feed-container max-w-2xl mx-auto p-4 space-y-6">
+  <!-- Új tweet -->
+  <app-new-tweet (posted)="reload()"></app-new-tweet>
+
+  <!-- Betöltés / hiba -->
+  <div *ngIf="loading" class="text-center text-gray-500">Loading tweets…</div>
+  <div *ngIf="error" class="text-center text-red-500">{{ error }}</div>
+
+  <!-- Tweetek listája -->
+  <div class="space-y-4">
+    <app-tweet-card
+      *ngFor="let t of tweets"
+      [tweet]="t"
+      [refreshFeed]="reload.bind(this)"
+    ></app-tweet-card>
+  </div>
+</div>

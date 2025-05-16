@@ -1,0 +1,22 @@
+/* Add this to your comment-list.component.scss */
+.comment-card {
+  margin-bottom: 10px;
+  width: 100%;
+
+  mat-card-actions {
+    padding: 8px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  button[mat-icon-button] {
+    /* Make the button more visible */
+    background-color: rgba(255, 0, 0, 0.1);
+  }
+}
+
+/* Also ensure mat-list-item has proper styling */
+mat-list-item {
+  height: auto !important;
+  margin-bottom: 10px;
+}

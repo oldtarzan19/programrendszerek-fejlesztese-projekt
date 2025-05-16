@@ -1,0 +1,155 @@
+<div
+  class="profile-container max-w-2xl mx-auto bg-white shadow rounded-lg p-6 space-y-6"
+  *ngIf="user"
+>
+  <h2 class="text-2xl font-bold">
+    {{ isOwnProfile ? 'My Profile' : user.username + "'s Profile" }}
+  </h2>
+
+  <!-- Szerkesztő űrlap -->
+  <form
+    *ngIf="isOwnProfile"
+    [formGroup]="form"
+    (ngSubmit)="save()"
+    class="space-y-4"
+  >
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" />
+        <mat-error *ngIf="form.get('email')?.errors?.['required']">
+          Email required
+        </mat-error>
+        <mat-error *ngIf="form.get('email')?.errors?.['email']">
+          Invalid email
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Username</mat-label>
+        <input matInput formControlName="username" />
+        <mat-error *ngIf="form.get('username')?.errors?.['required']">
+          Username required
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+    >
+      Save
+    </button>
+
+    <div *ngIf="error" class="text-red-500">{{ error }}</div>
+  </form>
+
+  <!-- Follow gomb ha más profil -->
+  <div class="flex items-center space-x-4">
+    <button
+      *ngIf="!isOwnProfile"
+      mat-raised-button
+      color="primary"
+      (click)="toggleFollow()"
+      [ngClass]="{
+        'bg-green-600 hover:bg-green-700': !isFollowing,
+        'bg-red-600 hover:bg-red-700': isFollowing
+      }"
+      class="text-white px-4 py-2 rounded"
+    >
+      {{ isFollowing ? 'Unfollow' : 'Follow' }}
+    </button>
+    <div class="flex items-center space-x-2">
+      <span class="font-semibold">{{ followersCount }}</span>
+      <span class="text-gray-600">Followers</span>
+    </div>
+    <div class="flex items-center space-x-2">
+      <span class="font-semibold">{{ followingCount }}</span>
+      <span class="text-gray-600">Following</span>
+    </div>
+  </div>
+
+  <hr class="border-gray-200" />
+
+  <!-- Tweetek -->
+  <h3 class="text-xl font-semibold">
+    {{ isOwnProfile ? 'My Tweets' : user.username + "'s Tweets" }}
+  </h3>
+
+  <div *ngIf="tweetsLoading" class="text-gray-500">Loading tweets…</div>
+  <div *ngIf="tweetsError" class="text-red-500">{{ tweetsError }}</div>
+
+  <div class="space-y-4">
+    <mat-card
+      *ngFor="let t of userTweets"
+      class="bg-white shadow rounded-lg p-4 hover:shadow-lg transition"
+    >
+      <mat-card-header class="pb-2 border-b border-gray-100">
+        <mat-card-title class="font-medium text-gray-800">
+          <ng-container *ngIf="editingTweetId !== t._id; else editTitle">
+            {{ t.content }}
+          </ng-container>
+          <ng-template #editTitle>
+            <form
+              [formGroup]="editForm"
+              (ngSubmit)="saveEdit(t)"
+              class="space-y-2"
+            >
+              <mat-form-field appearance="fill" class="w-full">
+                <textarea
+                  matInput
+                  formControlName="content"
+                  rows="2"
+                ></textarea>
+              </mat-form-field>
+              <div class="flex space-x-2">
+                <button
+                  mat-button
+                  color="primary"
+                  type="submit"
+                  class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                  [disabled]="!editForm.valid"
+                >
+                  Save
+                </button>
+                <button
+                  mat-button
+                  type="button"
+                  class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded"
+                  (click)="cancelEdit()"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </ng-template>
+        </mat-card-title>
+        <mat-card-subtitle class="text-gray-500 text-sm">
+          {{ t.createdAt | date:'short' }}
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-actions class="pt-2 flex space-x-4">
+        <button
+          mat-icon-button
+          *ngIf="canEdit(t) && editingTweetId !== t._id"
+          (click)="startEdit(t)"
+          class="text-gray-600 hover:text-blue-600"
+        >
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="warn"
+          *ngIf="isOwnProfile"
+          (click)="deleteTweet(t)"
+          class="ml-auto text-red-600 hover:text-red-800"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

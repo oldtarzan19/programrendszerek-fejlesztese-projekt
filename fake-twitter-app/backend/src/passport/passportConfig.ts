@@ -20,14 +20,13 @@ export const configurePassport = (passport: PassportStatic): void => {
         { usernameField: 'email' },
         async (email: string, password: string, done) => {
             try {
-                // A findOne callback helyett async/await-et használunk
-                const user = await User.findOne({ email }); // Így már Promise-alapú
+
+                const user = await User.findOne({ email });
 
                 if (!user) {
                     return done(null, false, { message: 'Incorrect email.' });
                 }
 
-                // comparePassword maradhat callback-es, ha a modelben úgy definiáltad
                 user.comparePassword(password, (err, isMatch) => {
                     if (err) return done(err);
                     if (!isMatch) {
